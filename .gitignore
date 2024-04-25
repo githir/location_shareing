@@ -1,0 +1,13 @@
+.Xauthority
+.bash_history
+.bash_logout
+.bashrc
+.cache/
+.node_repl_history
+.npm/
+.profile
+.sudo_as_admin_successful
+.vim/
+.viminfo
+.config
+

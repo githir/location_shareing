@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>位置情報を受信する</title>
+<script>
+var ws;
+
+function connectWebSocket() {
+  ws = new WebSocket('wss://18.233.147.77:8080');
+  ws.onmessage = function(event) {
+    // Blobオブジェクトを確認し、テキストに変換する
+    if (event.data instanceof Blob) {
+      var reader = new FileReader();
+      reader.onload = function() {
+        try {
+          var message = JSON.parse(reader.result);
+          var latitude = message.latitude;
+          var longitude = message.longitude;
+          document.getElementById("receivedLocation").innerHTML = "受信した位置情報: Latitude: " + latitude + ", Longitude: " + longitude;
+        } catch (e) {
+          console.error('JSONパースエラー:', e);
+        }
+      };
+      reader.readAsText(event.data);
+    } else {
+      // データがBlobでない場合は、通常通りJSONとしてパースする
+      try {
+        var message = JSON.parse(event.data);
+        var latitude = message.latitude;
+        var longitude = message.longitude;
+        document.getElementById("receivedLocation").innerHTML = "受信した位置情報: Latitude: " + latitude + ", Longitude: " + longitude;
+      } catch (e) {
+        console.error('JSONパースエラー:', e);
+      }
+    }
+  };
+  
+}
+
+// WebSocketに接続
+connectWebSocket();
+</script>
+</head>
+<body>
+
+<h2>受信した位置情報を表示する</h2>
+<p id="receivedLocation">位置情報を待っています...</p>
+
+</body>
+</html>
+

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>端末の位置情報を送信する</title>
+<script>
+var ws;
+
+function connectWebSocket() {
+  ws = new WebSocket('wss://18.233.147.77:8080');
+  ws.onopen = function() {
+    console.log('WebSocketに接続しました');
+  };
+  ws.onerror = function(error) {
+    console.error('WebSocketエラー:', error);
+  };
+}
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(sendPosition, showError);
+  } else {
+    document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
+  }
+}
+
+function sendPosition(position) {
+  var latitude = position.coords.latitude;
+  var longitude = position.coords.longitude;
+  var message = JSON.stringify({latitude: latitude, longitude: longitude});
+ if (ws.readyState === WebSocket.OPEN) {
+    // WebSocketが開いている場合、データを送信
+    ws.send(message);
+    document.getElementById("location").innerHTML = "位置情報を送信しました: " + message;
+ } else {
+    // WebSocketが閉じている場合、エラーハンドリング
+  console.error('WebSocket is not open. Unable to send data.');
+}
+
+}
+
+function showError(error) {
+
+  switch(error.code) {
+      case error.PERMISSION_DENIED:
+          document.getElementById("location").innerHTML = "User denied the request for Geolocation."
+          break;
+      case error.POSITION_UNAVAILABLE:
+          document.getElementById("location").innerHTML = "Location information is unavailable."
+          break;
+      case error.TIMEOUT:
+          document.getElementById("location").innerHTML = "The request to get user location timed out."
+          break;
+      case error.UNKNOWN_ERROR:
+          document.getElementById("location").innerHTML = "An unknown error occurred."
+          break;
+  }
+  // ... エラー処理は変更なし ...
+}
+
+// WebSocketに接続
+connectWebSocket();
+</script>
+</head>
+<body>
+
+<h2>端末の位置情報を送信する</h2>
+<button onclick="getLocation()">位置情報を取得して送信</button>
+<p id="location"></p>
+
+</body>
+</html>
